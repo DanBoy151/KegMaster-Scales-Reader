@@ -10,18 +10,20 @@ def _candidate_config_paths() -> List[Path]:
     return [
         settings_dir / "scales.yaml",
         settings_dir / "scales.yml",
-        settings_dir / "scales.json",
     ]
 
 
 def load_scales_config(path: Optional[str] = None) -> List[Dict]:
-    """Load scales configuration.
+        """Load scales configuration.
 
-    Expects a JSON file with the shape:
-    { "scales": [ {"name": "...", "address": "...", "literSize": 50.0}, ... ] }
+        Expects a YAML file with the shape:
+        scales:
+            - name: ...
+                address: ...
+                literSize: 50.0
 
-    Returns the list of scale dicts.
-    """
+        Returns the list of scale dicts.
+        """
     if path:
         p = Path(path)
         if not p.exists():
@@ -47,7 +49,7 @@ def load_scales_config(path: Optional[str] = None) -> List[Dict]:
             )
         data = yaml.safe_load(p.read_text(encoding="utf-8"))
     else:
-        # JSON
+        # JSON fallback (explicit path to a JSON file may still be supported)
         data = json.loads(p.read_text(encoding="utf-8"))
 
     scales = data.get("scales")
