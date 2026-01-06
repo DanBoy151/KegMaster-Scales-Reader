@@ -5,29 +5,37 @@ import asyncio
 # The Eddystone Service UUID
 EDDYSTONE_UUID = "0000aafe-0000-1000-8000-00805f9b34fb"
 
-def parse_custom_tlm(data):
-    """
-    Parses the Service Data portion of the packet.
-    Expected data starts after the 0xAAFE header.
-    """
+def parse_custom_tlm(hex_string):
     try:
-        # data[0] is usually the Frame Type (e.g., 0x20 for TLM)
-        # We start parsing from the voltage (bytes 1-2)
-        voltage = struct.unpack('>H', data[1:3])[0]
-        
-        # Temperature (8.8 fixed-point)
-        temp_int, temp_frac = struct.unpack('>bb', data[4:6])
-        temperature = temp_int + (temp_frac / 256.0)
-        
-        # Weight (The last 3 bytes of your specific packet)
-        # We pad with \x00 to make it 4 bytes for unpacking
-        weight_bytes = b'\x00' + data[-3:]
-        weight_grams = struct.unpack('>I', weight_bytes)[0]
-        
+        data = bytes.fromhex(hex_string)
+        service_data = data[11:]
+
+        # --- 1. Extract Raw Values ---
+        # Temperature: Bytes 15-16
+        t_raw = struct.unpack('>H', service_data[4:6])[0]
+
+        # Weight: Final 3 Bytes
+        w_raw = struct.unpack('>I', b'\x00' + service_data[-3:])[0]
+
+        # --- 2. Temperature Calculation ---
+        # Based on your data: 7.0C at 4240 and 3.5C at 4212
+        # Slope: 8 counts per degree
+        temp_c = (t_raw - 4184) / 8.0
+
+        # --- 3. Temperature-Compensated Weight ---
+        # m1 (Weight Gain), m2 (Temp Compensation Factor), and b (Intercept)
+        # These constants are derived to minimize the error across all 3 examples.
+        m1 = 0.00371   # Scale factor for raw weight
+        m2 = -0.0512   # Correction for thermal drift (kg per raw temp count)
+        b = -22.45     # Baseline offset
+
+        # Formula: (RawWeight * Scale) + (RawTemp * DriftCorrection) + Intercept
+        weight_kg = (w_raw * m1) + (t_raw * m2) + b
+
         return {
-            "voltage_mv": voltage,
-            "temp_c": round(temperature, 2),
-            "weight_kg": weight_grams / 1000.0
+            "temperature_c": round(temp_c, 2),
+            "weight_kg": round(weight_kg, 2),
+            "raw_debug": {"t": t_raw, "w": w_raw}
         }
     except Exception as e:
         return f"Parse Error: {e}"
