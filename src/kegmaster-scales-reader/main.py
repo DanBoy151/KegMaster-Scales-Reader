@@ -8,7 +8,7 @@ try:
 except Exception:
     BleakScanner = None  # type: ignore
 
-from .utils.kegScanner import EDDYSTONE_UUID, parse_custom_tlm
+from utils.kegScanner import EDDYSTONE_UUID, parse_custom_tlm
 
 
 def _normalize_mac(addr: str) -> str:
