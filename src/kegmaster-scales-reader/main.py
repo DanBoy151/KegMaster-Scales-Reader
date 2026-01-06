@@ -1,4 +1,4 @@
-from src.kegmaster_scales_reader.utils.config import load_scales_config
+from utils.config import load_scales_config
 
 import asyncio
 from typing import Dict
@@ -8,7 +8,7 @@ try:
 except Exception:
     BleakScanner = None  # type: ignore
 
-from src.kegmaster_scales_reader.utils.kegScanner import EDDYSTONE_UUID, parse_custom_tlm
+from .utils.kegScanner import EDDYSTONE_UUID, parse_custom_tlm
 
 
 def _normalize_mac(addr: str) -> str:
