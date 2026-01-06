@@ -8,7 +8,7 @@ try:
 except Exception:
     BleakScanner = None  # type: ignore
 
-from utils.kegScanner import parse_custom_tlm, EDDYSTONE_UUID
+from utils.kegScanner import parse_beacon_data
 
 
 def _normalize_mac(addr: str) -> str:
@@ -41,7 +41,7 @@ async def _scan_for_scales(scales_map: Dict[str, dict]):
         for key, raw in svc.items():
             
             print(raw)
-            stats = parse_custom_tlm(raw)
+            stats = parse_beacon_data(raw)
             scale = scales_map[addr_norm]
             print(f"== Scale: {scale.get('name','<unnamed>')} ({device.address}) ==")
             #print(f"  RSSI: {device.rssi}")
