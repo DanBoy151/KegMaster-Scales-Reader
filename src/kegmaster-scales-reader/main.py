@@ -8,7 +8,7 @@ try:
 except Exception:
     BleakScanner = None  # type: ignore
 
-from utils.kegScanner import EDDYSTONE_UUID, parse_custom_tlm
+from utils.kegScanner import parse_custom_tlm, EDDYSTONE_UUID
 
 
 def _normalize_mac(addr: str) -> str:
@@ -31,15 +31,15 @@ async def _scan_for_scales(scales_map: Dict[str, dict]):
 
         print("address is in config")
         print(device.address)
-        # service_data keys may be uuids; check for eddystone
+        # service_data keys may be uuids; iterate all entries
         svc = advertisement_data.service_data
         if not svc:
             print("no Service Data")
             return
 
-        # keys are lower-case UUIDs in Bleak
-        if EDDYSTONE_UUID in svc:
-            raw = svc[EDDYSTONE_UUID]
+        # iterate service_data entries; keys are lower-case UUIDs in Bleak
+        for key, raw in svc.items():
+            
             stats = parse_custom_tlm(raw)
             scale = scales_map[addr_norm]
             print(f"== Scale: {scale.get('name','<unnamed>')} ({device.address}) ==")
@@ -48,6 +48,7 @@ async def _scan_for_scales(scales_map: Dict[str, dict]):
             print(f"  Parsed: {stats}")
             print("" + "-" * 40)
             seen.add(addr_norm)
+        
 
     print("Starting scanner for configured scales... (Ctrl+C to stop)")
     scanner = BleakScanner(_detection)
