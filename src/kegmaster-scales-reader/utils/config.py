@@ -14,16 +14,16 @@ def _candidate_config_paths() -> List[Path]:
 
 
 def load_scales_config(path: Optional[str] = None) -> List[Dict]:
-        """Load scales configuration.
+    """Load scales configuration.
 
-        Expects a YAML file with the shape:
-        scales:
-            - name: ...
-                address: ...
-                literSize: 50.0
+    Expects a YAML file with the shape:
+    scales:
+      - name: ...
+        address: ...
+        literSize: 50.0
 
-        Returns the list of scale dicts.
-        """
+    Returns the list of scale dicts.
+    """
     if path:
         p = Path(path)
         if not p.exists():
