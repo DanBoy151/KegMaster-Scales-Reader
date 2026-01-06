@@ -40,11 +40,12 @@ async def _scan_for_scales(scales_map: Dict[str, dict]):
         # iterate service_data entries; keys are lower-case UUIDs in Bleak
         for key, raw in svc.items():
             
+            print(raw)
             stats = parse_custom_tlm(raw)
             scale = scales_map[addr_norm]
             print(f"== Scale: {scale.get('name','<unnamed>')} ({device.address}) ==")
-            print(f"  RSSI: {device.rssi}")
-            print(f"  Payload: {raw.hex().upper()}")
+            #print(f"  RSSI: {device.rssi}")
+            #print(f"  Payload: {raw.hex().upper()}")
             print(f"  Parsed: {stats}")
             print("" + "-" * 40)
             seen.add(addr_norm)

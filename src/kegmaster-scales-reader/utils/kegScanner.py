@@ -5,9 +5,8 @@ import asyncio
 # The Eddystone Service UUID
 EDDYSTONE_UUID = "0000aafe-0000-1000-8000-00805f9b34fb"
 
-def parse_custom_tlm(hex_string):
+def parse_custom_tlm(data):
     try:
-        data = bytes.fromhex(hex_string)
         service_data = data[11:]
 
         # --- 1. Extract Raw Values ---
