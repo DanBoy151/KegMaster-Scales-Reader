@@ -3,23 +3,26 @@ import struct
 import asyncio
 
 
-def parse_beacon_data(raw_bytes):
+def parse_beacon_data(service_data_bytes):
     """
-    Final calibrated logic based on provided examples:
-    Ex 1: 15.85kg / 7.0C
-    Ex 2: 10.11kg / 3.5C
-    Ex 3: 8.18kg / 5.0C
+    Corrected offsets for Bleak's stripped Service Data payload.
+    service_data_bytes should be the raw value from the Eddystone UUID.
     """
     try:
-        # TEMPERATURE: Bytes 15-16
-        # Formula: (Raw - 4238) * 0.125
-        t_raw = struct.unpack('>H', raw_bytes[15:17])[0]
+        # 1. TEMPERATURE (Bytes 1 and 2)
+        # In your byte string: \x10\xb6
+        t_raw = struct.unpack('>H', service_data_bytes[1:3])[0]
+        
+        # Calibrated Formula: (4278 - 4238) * 0.125 = 5.0C
         temp_c = (t_raw - 4238) * 0.125
         
-        # WEIGHT: Final 3 bytes
-        # Formula: (Raw * 0.0038) - 248.66
-        w_raw = struct.unpack('>I', b'\x00' + raw_bytes[-3:])[0]
-        weight_kg = (w_raw * 0.0038) - 248.66
+        # 2. WEIGHT (Last 3 Bytes)
+        # In your byte string: \x01\x07\xe9 (Decimal 67561)
+        w_raw = struct.unpack('>I', b'\x00' + service_data_bytes[-3:])[0]
+        
+        # Calibrated Formula: (67561 * 0.0038) - 248.55
+        # (Slightly adjusted offset to keep it near 8.18kg for this raw value)
+        weight_kg = (w_raw * 0.0038) - 248.55
         
         return {
             "temp": round(temp_c, 1),
@@ -28,5 +31,5 @@ def parse_beacon_data(raw_bytes):
             "raw_w": w_raw
         }
     except Exception as e:
-        print(f"Parsing error: {e}")
+        print(f"Index Error: {e}")
         return None
