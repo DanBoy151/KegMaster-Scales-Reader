@@ -25,12 +25,16 @@ async def _scan_for_scales(scales_map: Dict[str, dict]):
 
     def _detection(device, advertisement_data):
         addr_norm = _normalize_mac(device.address)
+        #print(addr_norm) 
         if addr_norm not in scales_map:
             return
 
+        print("address is in config")
+        print(device.address)
         # service_data keys may be uuids; check for eddystone
         svc = advertisement_data.service_data
         if not svc:
+            print("no Service Data")
             return
 
         # keys are lower-case UUIDs in Bleak
@@ -77,6 +81,7 @@ def main():
             continue
         norm = _normalize_mac(addr)
         scales_map[norm] = s
+        #print(norm)
         print(f" - {s.get('name','<unnamed>')}: {addr} ({s.get('literSize')} L)")
 
     # Start scanning loop

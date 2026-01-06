@@ -1,7 +1,10 @@
 scales:
-  - name: Tap-1
-    address: "00:11:22:33:44:55"
-    literSize: 19.0
-  - name: Tap-2
-    address: "AA:BB:CC:DD:EE:FF"
+  - name: Tap-3
+    address: "5C:01:3B:35:8B:22"
     literSize: 9.5
+  - name: Tap-2
+    address: "5C:01:3B:35:AE:12"
+    literSize: 19.0
+  - name: Tap-4
+    address: "5C:01:3B:35:5B:7E"
+    literSize: 19.0
